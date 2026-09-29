@@ -1,0 +1,139 @@
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-shared-layout',
+  template: `
+    <div class="top-header">
+      <div class="container">
+        <div class="top-header-content">
+          <div class="left-info"><i class="fa-solid fa-location-dot"></i> Chitaipur, Varanasi</div>
+          <div class="center-info">🕉️ धर्मेश्वर वाटिका एवं गेस्ट हाउस 🕉️</div>
+          <div class="right-info">
+            <a href="tel:+918208417376"><i class="fa-solid fa-phone"></i> +91 8208417376</a>
+            <a href="https://wa.me/918208417376"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.facebook.com/DharmeshwarVatikaAndGuestHouse"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="announcement-bar">
+      <div class="announcement-track">
+        <div class="announcement-item">🕉️ Welcome to Dharmeshwar Vatika & Guest House</div>
+        <div class="announcement-item">💍 Marriage Hall Booking Open</div>
+        <div class="announcement-item">🏨 Luxury AC Rooms Available</div>
+        <div class="announcement-item">🎉 Birthday | Anniversary | Kitty Party</div>
+        <div class="announcement-item">💐 Engagement | Reception | Corporate Events</div>
+        <div class="announcement-item">🍽 Catering Available</div>
+        <div class="announcement-item">🚗 Free Parking</div>
+        <div class="announcement-item">📞 8208417376</div>
+        <div class="announcement-item">🕉️ Welcome to Dharmeshwar Vatika</div>
+        <div class="announcement-item">💍 Marriage Hall Booking Open</div>
+        <div class="announcement-item">🏨 Luxury Rooms</div>
+        <div class="announcement-item">🎉 Birthday Parties</div>
+        <div class="announcement-item">📞 Book Today</div>
+      </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg custom-navbar sticky-top">
+      <div class="container">
+        <a class="navbar-brand" routerLink="/home">
+          <img src="assets/images/logo.jpg" alt="Logo" />
+          <div class="brand-text">
+            <h2>Dharmeshwar Vatika</h2>
+            <p>Guest House & Banquet Hall</p>
+          </div>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbar">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active">Home</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/about" routerLinkActive="active">About</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/services" routerLinkActive="active">Services</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/gallery" routerLinkActive="active">Gallery</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/booking" routerLinkActive="active">Booking</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/payment" routerLinkActive="active">Payment</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/contact" routerLinkActive="active">Contact</a></li>
+          </ul>
+          <a routerLink="/booking" class="book-btn">Book Now</a>
+        </div>
+      </div>
+    </nav>
+
+    <router-outlet></router-outlet>
+
+    <footer class="footer-section">
+      <div class="container">
+        <div class="row gy-5">
+          <div class="col-lg-4">
+            <div class="footer-widget">
+              <img src="assets/images/logo.jpg" class="footer-logo" alt="Logo" />
+              <h3>Dharmeshwar Vatika<br /><span>Guest House & Banquet Hall</span></h3>
+              <p>Experience premium hospitality with luxurious banquet halls, elegant marriage venues, comfortable guest rooms and unforgettable celebrations.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-2">
+            <div class="footer-widget">
+              <h4>Quick Links</h4>
+              <ul>
+                <li><a routerLink="/home">Home</a></li>
+                <li><a routerLink="/about">About</a></li>
+                <li><a routerLink="/services">Services</a></li>
+                <li><a routerLink="/gallery">Gallery</a></li>
+                <li><a routerLink="/booking">Booking</a></li>
+                <li><a routerLink="/contact">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-lg-3">
+            <div class="footer-widget">
+              <h4>Our Services</h4>
+              <ul>
+                <li>Luxury Guest Rooms</li>
+                <li>Marriage Hall</li>
+                <li>Reception Venue</li>
+                <li>Birthday Party</li>
+                <li>Anniversary Celebration</li>
+                <li>Catering Service</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-lg-3">
+            <div class="footer-widget">
+              <h4>Contact Us</h4>
+              <p><i class="fa-solid fa-location-dot"></i> Chitaipur, Varanasi</p>
+              <p><i class="fa-solid fa-phone"></i> +91 8208417376</p>
+              <p><i class="fa-solid fa-phone"></i> +91 9415295728</p>
+              <p><i class="fa-solid fa-clock"></i> Open 24 Hours</p>
+              <div class="footer-social">
+                <a href="https://www.facebook.com/DharmeshwarVatikaAndGuestHouse" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/918208417376"><i class="fab fa-whatsapp"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-md-6">© {{ currentYear }} Dharmeshwar Vatika & Guest House. All Rights Reserved.</div>
+            <div class="col-md-6 text-md-end">Designed with ❤️ for Premium Hospitality</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  `
+})
+export class SharedLayoutComponent {
+  currentYear = new Date().getFullYear();
+}

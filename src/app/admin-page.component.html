@@ -1,0 +1,125 @@
+<section class="admin-section py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-subtitle">Operations Dashboard</span>
+      <h2 class="section-title">Room Management Admin</h2>
+      <p class="section-description">Track room availability, occupancy, reservations, and housekeeping in real time.</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-md-3">
+        <div class="admin-stat-card">
+          <div class="stat-label">Total Rooms</div>
+          <div class="stat-value">{{ summary.total }}</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="admin-stat-card available">
+          <div class="stat-label">Available</div>
+          <div class="stat-value">{{ summary.available }}</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="admin-stat-card occupied">
+          <div class="stat-label">Occupied</div>
+          <div class="stat-value">{{ summary.occupied }}</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="admin-stat-card reserved">
+          <div class="stat-label">Reserved</div>
+          <div class="stat-value">{{ summary.reserved }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-md-3 offset-md-9">
+        <div class="admin-stat-card cleaning">
+          <div class="stat-label">Need Cleaning</div>
+          <div class="stat-value">{{ summary.cleaning }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-5">
+      <div class="card-body">
+        <h4 class="mb-3">Add New Room</h4>
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Room ID</label>
+            <input [(ngModel)]="newRoom.id" type="number" class="form-control" placeholder="101" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Room Name</label>
+            <input [(ngModel)]="newRoom.name" type="text" class="form-control" placeholder="Room 105" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Type</label>
+            <select [(ngModel)]="newRoom.type" class="form-select">
+              <option value="Guest Room">Guest Room</option>
+              <option value="Family Suite">Family Suite</option>
+              <option value="Deluxe Room">Deluxe Room</option>
+              <option value="Marriage Hall">Marriage Hall</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select [(ngModel)]="newRoom.status" class="form-select">
+              <option value="available">Available</option>
+              <option value="occupied">Occupied</option>
+              <option value="reserved">Reserved</option>
+              <option value="cleaning">Cleaning</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Guest / Booking</label>
+            <input [(ngModel)]="newRoom.guestName" type="text" class="form-control" placeholder="No guest" />
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <button class="btn btn-primary w-100" (click)="addRoom()">Add Room</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-bordered admin-table">
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>Type</th>
+            <th>Current Status</th>
+            <th>Guest / Booking</th>
+            <th>Last Updated</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let room of rooms">
+            <td>{{ room.name }}</td>
+            <td>{{ room.type }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(room.status)">{{ getStatusLabel(room.status) }}</span>
+            </td>
+            <td>{{ room.guestName }}</td>
+            <td>{{ room.lastUpdated }}</td>
+            <td>
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-sm btn-outline-warning" (click)="markForCleaning(room.id)">Mark Cleaning</button>
+                <button class="btn btn-sm btn-outline-success" (click)="completeCleaning(room.id)">Cleaning Done</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteRoom(room.id)">Delete</button>
+                <select class="form-select form-select-sm admin-status-select" [value]="room.status" (change)="setStatus(room.id, $any($event.target).value)">
+                  <option value="available">Available</option>
+                  <option value="occupied">Occupied</option>
+                  <option value="reserved">Reserved</option>
+                  <option value="cleaning">Cleaning</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

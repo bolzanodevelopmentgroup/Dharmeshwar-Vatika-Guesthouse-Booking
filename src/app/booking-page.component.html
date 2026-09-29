@@ -1,0 +1,312 @@
+<section class="booking-section py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-subtitle">Reserve Your Event</span>
+      <h2 class="section-title">Book Your Event & Stay</h2>
+      <p class="section-description">Weddings • Reception • Birthday • Anniversary • Guest Rooms • Corporate Events</p>
+    </div>
+
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-8">
+        <div class="booking-card">
+          <h3><i class="fa-solid fa-calendar-check"></i> Online Booking Form</h3>
+
+          <form id="bookingForm" (ngSubmit)="submitBooking()">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <label>Full Name <span class="text-danger">*</span></label>
+                <input id="customerName" name="customerName" [(ngModel)]="booking.customerName" type="text" class="form-control" placeholder="Enter Full Name" required />
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>Mobile Number <span class="text-danger">*</span></label>
+                <input id="customerMobile" name="customerMobile" [(ngModel)]="booking.customerMobile" type="tel" class="form-control" placeholder="+91 9876543210" required />
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>Email Address</label>
+                <input id="customerEmail" name="customerEmail" [(ngModel)]="booking.customerEmail" type="email" class="form-control" placeholder="example@gmail.com" />
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>Booking Date</label>
+                <input id="bookingDate" name="bookingDate" [(ngModel)]="booking.bookingDate" type="date" class="form-control" />
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>Check-in Date</label>
+                <input name="checkIn" [(ngModel)]="booking.checkIn" type="date" class="form-control" (ngModelChange)="onDatesChanged()" />
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>Check-out Date</label>
+                <input name="checkOut" [(ngModel)]="booking.checkOut" type="date" class="form-control" (ngModelChange)="onDatesChanged()" />
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>Event Type</label>
+                <select id="eventType" name="eventType" [(ngModel)]="booking.eventType" class="form-select">
+                  <option>Marriage</option>
+                  <option>Reception</option>
+                  <option>Birthday Party</option>
+                  <option>Anniversary</option>
+                  <option>Engagement</option>
+                  <option>Corporate Event</option>
+                  <option>Guest Room</option>
+                </select>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>No. of Guests</label>
+                <input id="guestCount" name="guestCount" [(ngModel)]="booking.guestCount" type="number" class="form-control" placeholder="100" />
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>Room Type</label>
+                <select name="roomType" [(ngModel)]="booking.roomType" class="form-select" (ngModelChange)="onRoomTypeChanged()">
+                  <option value="guest-room">Guest Room</option>
+                  <option value="family-suite">Family Suite</option>
+                  <option value="deluxe-room">Deluxe Room</option>
+                  <option value="marriage-hall">Marriage Hall</option>
+                </select>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <label>Rooms Needed</label>
+                <input name="roomCount" [(ngModel)]="booking.roomCount" type="number" min="1" class="form-control" placeholder="1" />
+              </div>
+
+              <div class="col-12 mb-4">
+
+  <div class="availability-box p-3 rounded-3 border bg-light">
+
+    <div class="d-flex justify-content-between align-items-center">
+
+      <div>
+        <strong>Total Rooms:</strong>
+
+        <span class="ms-2">
+          {{ totalRooms }}
+        </span>
+      </div>
+
+      <div
+        [ngClass]="{
+          'text-success': availableRooms > 0,
+          'text-danger': availableRooms === 0
+        }"
+      >
+        <strong>
+          Available:
+        </strong>
+
+        <span class="ms-2">
+          {{ availableRooms }}
+        </span>
+      </div>
+
+    </div>
+
+    <div class="mt-2">
+
+      <strong>
+        Booking status:
+      </strong>
+
+      <span
+        class="ms-2"
+        [ngClass]="getLiveAvailabilityClass()"
+      >
+        {{ getLiveAvailabilityLabel() }}
+      </span>
+
+    </div>
+
+    <div class="mt-2 small text-muted">
+
+      {{ lastUpdatedText }}
+
+      <span
+        class="ms-2"
+        *ngIf="realtimeConnected"
+      >
+        ● Live
+      </span>
+
+      <span
+        class="ms-2 text-danger"
+        *ngIf="!realtimeConnected"
+      >
+        ● Reconnecting...
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+
+              <div class="col-12 mb-4">
+                <div class="availability-box p-3 rounded-3 border">
+                  <strong>Live Availability:</strong>
+                  <span class="ms-2" [ngClass]="getLiveAvailabilityClass()">
+                    {{ getLiveAvailabilityLabel() }}
+                  </span>
+                  <span class="ms-2 text-muted" *ngIf="getAvailabilityForActiveRoom().available > 0">
+                    {{ getAvailabilityForActiveRoom().available }} rooms left
+                  </span>
+                  <span class="ms-2 text-danger" *ngIf="getAvailabilityForActiveRoom().available === 0">
+                    Fully booked for now
+                  </span>
+                </div>
+
+                <div class="col-12 mb-4">
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <strong>
+        {{ booking.roomType | titlecase }}
+        Room Status
+      </strong>
+
+    </div>
+
+    <div class="card-body">
+
+      <div
+        class="row g-2"
+        *ngIf="getSelectedRooms().length > 0"
+      >
+
+        <div
+          class="col-md-4"
+          *ngFor="
+            let room of getSelectedRooms()
+          "
+        >
+
+          <div class="border rounded p-3">
+
+            <div
+              class="fw-bold"
+            >
+              {{ room.name }}
+            </div>
+
+            <div class="small text-muted">
+              Room ID:
+              {{ room.id }}
+            </div>
+
+            <div class="mt-2">
+
+              <span
+                class="status-badge"
+                [ngClass]="
+                  getRoomStatusClass(
+                    room.status
+                  )
+                "
+              >
+                {{
+                  getRoomStatusLabel(
+                    room.status
+                  )
+                }}
+              </span>
+
+            </div>
+
+            <div
+              class="small mt-2"
+              *ngIf="
+                room.guestName &&
+                room.guestName !== 'No guest'
+              "
+            >
+              {{ room.guestName }}
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div
+        class="alert alert-warning mb-0"
+        *ngIf="
+          getSelectedRooms().length === 0
+        "
+      >
+        No rooms configured for this room type.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+              </div>
+
+              <div class="col-12 mb-4" *ngIf="confirmationMessage">
+                <div class="alert alert-success mb-0">{{ confirmationMessage }}</div>
+              </div>
+
+              <div class="col-12 mb-4">
+                <label>Special Requirements</label>
+                <textarea id="requirements" name="requirements" [(ngModel)]="booking.requirements" class="form-control" rows="5" placeholder="Decoration, Catering, DJ, Rooms, etc."></textarea>
+              </div>
+
+              <div class="col-md-6">
+                <button
+  type="submit"
+  class="booking-btn"
+  [disabled]="isBookingUnavailable()"
+>
+  <i class="fa-solid fa-paper-plane"></i>
+
+  {{
+    isBookingUnavailable()
+      ? 'Rooms Not Available'
+      : 'Send Booking Request'
+  }}
+</button>
+              </div>
+
+              <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <a routerLink="/payment" class="payment-btn"><i class="fa-solid fa-credit-card"></i> Proceed to Payment</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="booking-info-card">
+          <h3>Why Book With Us?</h3>
+          <ul>
+            <li><i class="fa-solid fa-circle-check"></i> Instant Booking Confirmation</li>
+            <li><i class="fa-solid fa-circle-check"></i> Premium Marriage Hall</li>
+            <li><i class="fa-solid fa-circle-check"></i> Luxury AC Rooms</li>
+            <li><i class="fa-solid fa-circle-check"></i> Catering & Decoration</li>
+            <li><i class="fa-solid fa-circle-check"></i> DJ & Sound System</li>
+            <li><i class="fa-solid fa-circle-check"></i> Spacious Parking</li>
+            <li><i class="fa-solid fa-circle-check"></i> 24×7 Customer Support</li>
+          </ul>
+          <hr />
+          <h5>📞 Call For Booking</h5>
+          <a href="tel:+918208417376"> +91 8208417376 </a><br />
+          <a href="tel:+919415295728"> +91 9415295728 </a><br />
+          <a href="tel:+917385950856"> +91 7385950856 </a>
+          <div class="mt-4">
+            <a href="https://wa.me/918208417376" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> WhatsApp Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+.status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.status-available {
+  background: rgba(25, 135, 84, 0.14);
+  color: #198754;
+}
+
+.status-occupied {
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+}
+
+.status-reserved {
+  background: rgba(13, 110, 253, 0.12);
+  color: #0d6efd;
+}
+
+.status-cleaning {
+  background: rgba(255, 193, 7, 0.14);
+  color: #b8860b;
+}

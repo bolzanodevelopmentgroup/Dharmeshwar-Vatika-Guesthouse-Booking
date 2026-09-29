@@ -1,0 +1,92 @@
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-subtitle">Payment</span>
+      <h2 class="section-title">Online Payment</h2>
+      <p class="section-description">Pay your advance booking amount securely.</p>
+    </div>
+
+    <div class="row text-center">
+      <div class="col-lg-3">
+        <div class="payment-card" data-bs-toggle="modal" data-bs-target="#gpayModal" style="cursor: pointer">
+          <i class="fa-brands fa-google-pay fa-4x text-primary"></i>
+          <h5>Google Pay</h5>
+          <p class="small text-muted">Click to Pay</p>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="payment-card">
+          <i class="fa-solid fa-mobile-screen-button fa-4x"></i>
+          <h5>PhonePe</h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="payment-card">
+          <i class="fa-solid fa-qrcode fa-4x"></i>
+          <h5>UPI</h5>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="payment-card">
+          <i class="fa-solid fa-credit-card fa-4x"></i>
+          <h5>Debit / Credit Card</h5>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
+        <i class="fa-solid fa-credit-card"></i> Pay ₹1000 Advance
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="modal fade" id="paymentModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h4>Demo Online Payment</h4>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 text-center">
+            <h5>Scan QR Code</h5>
+            <img src="assets/images/payment-qr.jpg" class="img-fluid rounded shadow" style="max-width: 220px" />
+          </div>
+          <div class="col-md-6">
+            <h5>Payment Steps</h5>
+            <ol>
+              <li>Open Google Pay / PhonePe / Paytm.</li>
+              <li>Scan the QR Code.</li>
+              <li>Pay ₹1000 as Advance Booking Amount.</li>
+              <li>Take Screenshot of Payment.</li>
+              <li>Share Screenshot on WhatsApp.</li>
+              <li>Your booking will be confirmed.</li>
+            </ol>
+            <hr />
+            <a href="https://wa.me/917044099619" target="_blank" class="btn btn-success w-100"><i class="fab fa-whatsapp"></i> Send Payment Screenshot</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="gpayModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5>Google Pay</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img src="assets/images/gpay-qr.jpg" class="img-fluid mb-3" style="max-width: 220px" alt="Google Pay QR" />
+        <h5>UPI ID</h5>
+        <p><strong>akjha29@okicici</strong></p>
+        <button class="btn btn-primary" (click)="copyUPI()"><i class="fa-regular fa-copy"></i> Copy UPI ID</button>
+      </div>
+    </div>
+  </div>
+</div>
