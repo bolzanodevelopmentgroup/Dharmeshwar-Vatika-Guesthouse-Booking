@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -17,6 +18,127 @@ const MONGODB_URI =
 
 const FRONTEND_ORIGIN =
   process.env.FRONTEND_ORIGIN || 'http://localhost:4200';
+
+const ADMIN_EMAIL = 'bolzanodevelopmentgroup@gmail.com';
+const ADMIN_WHATSAPP =
+  process.env.BOOKING_WHATSAPP_TO || '917044099619';
+
+const mailTransporter =
+  process.env.SMTP_HOST &&
+  process.env.SMTP_USER &&
+  process.env.SMTP_PASS
+    ? nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      })
+    : null;
+
+async function sendBookingNotifications(booking) {
+  const statuses = {
+    email: 'not_configured',
+    whatsapp: 'not_configured'
+  };
+
+  const bookingDetails = [
+    `Name: ${booking.customerName}`,
+    `Mobile: ${booking.customerMobile}`,
+    `Email: ${booking.customerEmail}`,
+    `Booking date: ${booking.bookingDate || 'Not selected'}`,
+    `Event: ${booking.eventType || 'Not specified'}`,
+    `Room type: ${booking.roomType}`,
+    `Rooms: ${booking.roomsBooked}`,
+    `Check-in: ${booking.checkIn}`,
+    `Check-out: ${booking.checkOut}`,
+    `Guests: ${booking.guestCount || 'Not mentioned'}`,
+    `Requirements: ${booking.requirements || 'None'}`
+  ].join('\n');
+
+  if (mailTransporter) {
+    try {
+      await mailTransporter.sendMail({
+        from: process.env.SMTP_FROM || process.env.SMTP_USER,
+        to: ADMIN_EMAIL,
+        replyTo: booking.customerEmail,
+        subject: `New booking request from ${booking.customerName}`,
+        text: `A customer submitted a booking request.\n\n${bookingDetails}`
+      });
+      statuses.email = 'sent';
+    } catch (error) {
+      statuses.email = 'failed';
+      console.error('Booking email notification failed:', error.message);
+    }
+  }
+
+  const whatsappToken = process.env.WHATSAPP_ACCESS_TOKEN;
+  const whatsappPhoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const whatsappTemplateName = process.env.WHATSAPP_TEMPLATE_NAME;
+
+  if (
+    whatsappToken &&
+    whatsappPhoneNumberId &&
+    whatsappTemplateName
+  ) {
+    try {
+      const apiVersion = process.env.WHATSAPP_API_VERSION || 'v22.0';
+      const response = await fetch(
+        `https://graph.facebook.com/${apiVersion}/${whatsappPhoneNumberId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${whatsappToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            messaging_product: 'whatsapp',
+            recipient_type: 'individual',
+            to: ADMIN_WHATSAPP,
+            type: 'template',
+            template: {
+              name: whatsappTemplateName,
+              language: {
+                code: process.env.WHATSAPP_TEMPLATE_LANGUAGE || 'en_US'
+              },
+              components: [
+                {
+                  type: 'body',
+                  parameters: [
+                    {
+                      type: 'text',
+                      text: `New booking request\n\n${bookingDetails}`
+                    }
+                  ]
+                }
+              ]
+            }
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`WhatsApp API returned HTTP ${response.status}`);
+      }
+
+      statuses.whatsapp = 'sent';
+    } catch (error) {
+      statuses.whatsapp = 'failed';
+      console.error('Booking WhatsApp notification failed:', error.message);
+    }
+  }
+
+  if (statuses.email === 'not_configured') {
+    console.warn('Booking email notification skipped: SMTP is not configured.');
+  }
+  if (statuses.whatsapp === 'not_configured') {
+    console.warn('Booking WhatsApp notification skipped: Cloud API credentials or approved template are not configured.');
+  }
+
+  return statuses;
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -253,6 +375,20 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+
+    customerName: String,
+
+    customerMobile: String,
+
+    customerEmail: String,
+
+    bookingDate: String,
+
+    eventType: String,
+
+    guestCount: String,
+
+    requirements: String,
 
     checkIn: {
       type: String,
@@ -1514,6 +1650,13 @@ app.post(
       const {
         roomType,
         guestName,
+        customerName,
+        customerMobile,
+        customerEmail,
+        bookingDate,
+        eventType,
+        guestCount,
+        requirements,
         checkIn,
         checkOut,
         roomsBooked
@@ -1522,6 +1665,8 @@ app.post(
       if (
         !roomType ||
         !guestName ||
+        !customerMobile ||
+        !customerEmail ||
         !checkIn ||
         !checkOut
       ) {
@@ -1530,6 +1675,18 @@ app.post(
           available: 0,
           message:
             'Please complete all booking details.'
+        });
+      }
+
+      if (
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+          String(customerEmail).trim()
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          available: 0,
+          message: 'Please provide a valid email address.'
         });
       }
 
@@ -1637,6 +1794,27 @@ app.post(
         guestName:
           String(guestName).trim(),
 
+        customerName:
+          String(customerName || guestName).trim(),
+
+        customerMobile:
+          String(customerMobile).trim(),
+
+        customerEmail:
+          String(customerEmail).trim(),
+
+        bookingDate:
+          bookingDate || '',
+
+        eventType:
+          eventType || '',
+
+        guestCount:
+          guestCount || '',
+
+        requirements:
+          requirements || '',
+
         checkIn,
 
         checkOut,
@@ -1682,6 +1860,11 @@ app.post(
       const savedBooking =
         await persistBooking(
           newBooking
+        );
+
+      const notificationStatus =
+        await sendBookingNotifications(
+          savedBooking
         );
 
       /*
@@ -1730,6 +1913,9 @@ app.post(
 
         available:
           updatedAvailability.available,
+
+        notifications:
+          notificationStatus,
 
         message:
           `Booking confirmed for ${requestedRooms} room(s) from ${checkIn} to ${checkOut}.`

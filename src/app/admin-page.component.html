@@ -1,125 +1,838 @@
+```html
 <section class="admin-section py-5">
+
   <div class="container">
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+
     <div class="text-center mb-5">
-      <span class="section-subtitle">Operations Dashboard</span>
-      <h2 class="section-title">Room Management Admin</h2>
-      <p class="section-description">Track room availability, occupancy, reservations, and housekeeping in real time.</p>
+
+      <span class="section-subtitle">
+        Operations Dashboard
+      </span>
+
+      <h2 class="section-title">
+        Room Management Admin
+      </h2>
+
+      <p class="section-description">
+        Track room availability, occupancy, reservations,
+        customer bookings and housekeeping in real time.
+      </p>
+
+      <div class="mt-3">
+
+        <span
+          class="badge"
+          [ngClass]="
+            realtimeConnected
+              ? 'bg-success'
+              : 'bg-secondary'
+          "
+        >
+
+          <i
+            class="fa-solid"
+            [ngClass]="
+              realtimeConnected
+                ? 'fa-circle-check'
+                : 'fa-circle-xmark'
+            "
+          ></i>
+
+          {{
+            realtimeConnected
+              ? 'Real-time Connected'
+              : 'Real-time Disconnected'
+          }}
+
+        </span>
+
+      </div>
+
     </div>
 
+
+    <!-- =========================================================
+         ROOM SUMMARY
+    ========================================================== -->
+
     <div class="row g-4 mb-5">
+
       <div class="col-md-3">
+
         <div class="admin-stat-card">
-          <div class="stat-label">Total Rooms</div>
-          <div class="stat-value">{{ summary.total }}</div>
+
+          <div class="stat-label">
+            Total Rooms
+          </div>
+
+          <div class="stat-value">
+            {{ summary.total }}
+          </div>
+
         </div>
+
       </div>
+
+
       <div class="col-md-3">
+
         <div class="admin-stat-card available">
-          <div class="stat-label">Available</div>
-          <div class="stat-value">{{ summary.available }}</div>
+
+          <div class="stat-label">
+            Available
+          </div>
+
+          <div class="stat-value">
+            {{ summary.available }}
+          </div>
+
         </div>
+
       </div>
+
+
       <div class="col-md-3">
+
         <div class="admin-stat-card occupied">
-          <div class="stat-label">Occupied</div>
-          <div class="stat-value">{{ summary.occupied }}</div>
+
+          <div class="stat-label">
+            Occupied
+          </div>
+
+          <div class="stat-value">
+            {{ summary.occupied }}
+          </div>
+
         </div>
+
       </div>
+
+
       <div class="col-md-3">
+
         <div class="admin-stat-card reserved">
-          <div class="stat-label">Reserved</div>
-          <div class="stat-value">{{ summary.reserved }}</div>
+
+          <div class="stat-label">
+            Reserved
+          </div>
+
+          <div class="stat-value">
+            {{ summary.reserved }}
+          </div>
+
         </div>
+
       </div>
+
     </div>
 
+
     <div class="row g-4 mb-5">
+
       <div class="col-md-3 offset-md-9">
+
         <div class="admin-stat-card cleaning">
-          <div class="stat-label">Need Cleaning</div>
-          <div class="stat-value">{{ summary.cleaning }}</div>
+
+          <div class="stat-label">
+            Need Cleaning
+          </div>
+
+          <div class="stat-value">
+            {{ summary.cleaning }}
+          </div>
+
         </div>
+
       </div>
+
     </div>
+
+
+    <!-- =========================================================
+         CUSTOMER BOOKINGS
+    ========================================================== -->
+
+    <div class="card shadow-sm mb-5">
+
+      <div class="card-body">
+
+        <div
+          class="d-flex justify-content-between align-items-center
+                 flex-wrap gap-2 mb-4"
+        >
+
+          <div>
+
+            <h4 class="mb-1">
+              <i class="fa-solid fa-calendar-check"></i>
+              Customer Booking Details
+            </h4>
+
+            <p class="text-muted mb-0">
+              New customer bookings appear here automatically.
+            </p>
+
+          </div>
+
+          <span class="badge bg-primary">
+
+            {{ bookings.length }}
+            Booking{{ bookings.length === 1 ? '' : 's' }}
+
+          </span>
+
+        </div>
+
+
+        <!-- No bookings -->
+
+        <div
+          *ngIf="bookings.length === 0"
+          class="alert alert-info"
+        >
+
+          <i class="fa-solid fa-circle-info"></i>
+
+          No customer bookings found.
+
+        </div>
+
+
+        <!-- Booking table -->
+
+        <div
+          *ngIf="bookings.length > 0"
+          class="table-responsive"
+        >
+
+          <table
+            class="table table-bordered table-hover align-middle"
+          >
+
+            <thead class="table-dark">
+
+              <tr>
+
+                <th>
+                  Customer
+                </th>
+
+                <th>
+                  Contact
+                </th>
+
+                <th>
+                  Booking
+                </th>
+
+                <th>
+                  Stay / Event
+                </th>
+
+                <th>
+                  Rooms
+                </th>
+
+                <th>
+                  Requirements
+                </th>
+
+                <th>
+                  Actions
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              <tr
+                *ngFor="let booking of bookings"
+              >
+
+                <!-- CUSTOMER -->
+
+                <td>
+
+                  <strong>
+                    {{ booking.customerName || booking.guestName }}
+                  </strong>
+
+                  <br />
+
+                  <small class="text-muted">
+
+                    Booking ID:
+                    {{ booking.id }}
+
+                  </small>
+
+                </td>
+
+
+                <!-- CONTACT -->
+
+                <td>
+
+                  <div class="mb-1">
+
+                    <i class="fa-solid fa-phone"></i>
+
+                    {{ booking.customerMobile }}
+
+                  </div>
+
+
+                  <div>
+
+                    <i class="fa-solid fa-envelope"></i>
+
+                    {{ booking.customerEmail }}
+
+                  </div>
+
+                </td>
+
+
+                <!-- BOOKING -->
+
+                <td>
+
+                  <strong>
+                    {{ getBookingRoomType(booking.roomType) }}
+                  </strong>
+
+                  <br />
+
+                  <span
+                    class="badge bg-warning text-dark mt-1"
+                  >
+
+                    {{ booking.roomsBooked }}
+                    Room{{ booking.roomsBooked === 1 ? '' : 's' }}
+
+                  </span>
+
+                  <br />
+
+                  <small>
+
+                    Booking Date:
+                    {{ booking.bookingDate || '-' }}
+
+                  </small>
+
+                </td>
+
+
+                <!-- STAY / EVENT -->
+
+                <td>
+
+                  <strong>
+                    {{ booking.eventType || 'Guest Stay' }}
+                  </strong>
+
+                  <br />
+
+                  <small>
+
+                    Check-in:
+                    {{ booking.checkIn }}
+
+                  </small>
+
+                  <br />
+
+                  <small>
+
+                    Check-out:
+                    {{ booking.checkOut }}
+
+                  </small>
+
+                  <br />
+
+                  <small
+                    *ngIf="booking.guestCount"
+                  >
+
+                    Guests:
+                    {{ booking.guestCount }}
+
+                  </small>
+
+                </td>
+
+
+                <!-- ROOMS -->
+
+                <td>
+
+                  <span
+                    *ngIf="booking.roomIds?.length"
+                  >
+
+                    Room IDs:
+                    {{ booking.roomIds?.join(', ') }}
+
+                  </span>
+
+                  <span
+                    *ngIf="!booking.roomIds?.length"
+                  >
+
+                    Room:
+                    {{ booking.roomId || '-' }}
+
+                  </span>
+
+                </td>
+
+
+                <!-- REQUIREMENTS -->
+
+                <td>
+
+                  <span
+                    *ngIf="booking.requirements"
+                  >
+                    {{ booking.requirements }}
+                  </span>
+
+                  <span
+                    *ngIf="!booking.requirements"
+                    class="text-muted"
+                  >
+                    None
+                  </span>
+
+                </td>
+
+
+                <!-- ACTIONS -->
+
+                <td>
+
+                  <div
+                    class="d-flex flex-wrap gap-2"
+                  >
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-success"
+                      (click)="
+                        callCustomer(
+                          booking.customerMobile
+                        )
+                      "
+                      title="Call customer"
+                    >
+
+                      <i class="fa-solid fa-phone"></i>
+
+                      Call
+
+                    </button>
+
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-success"
+                      (click)="
+                        whatsappCustomer(
+                          booking.customerMobile
+                        )
+                      "
+                      title="WhatsApp customer"
+                    >
+
+                      <i class="fa-brands fa-whatsapp"></i>
+
+                      WhatsApp
+
+                    </button>
+
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary"
+                      (click)="
+                        emailCustomer(
+                          booking.customerEmail
+                        )
+                      "
+                      title="Email customer"
+                    >
+
+                      <i class="fa-solid fa-envelope"></i>
+
+                      Email
+
+                    </button>
+
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger"
+                      (click)="
+                        deleteBooking(
+                          booking.id
+                        )
+                      "
+                    >
+
+                      <i class="fa-solid fa-trash"></i>
+
+                      Delete
+
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         ADD ROOM
+    ========================================================== -->
 
     <div class="card mb-5">
+
       <div class="card-body">
-        <h4 class="mb-3">Add New Room</h4>
+
+        <h4 class="mb-3">
+          Add New Room
+        </h4>
+
         <div class="row g-3">
+
           <div class="col-md-3">
-            <label class="form-label">Room ID</label>
-            <input [(ngModel)]="newRoom.id" type="number" class="form-control" placeholder="101" />
+
+            <label class="form-label">
+              Room ID
+            </label>
+
+            <input
+              [(ngModel)]="newRoom.id"
+              type="number"
+              class="form-control"
+              placeholder="101"
+            />
+
           </div>
+
+
           <div class="col-md-3">
-            <label class="form-label">Room Name</label>
-            <input [(ngModel)]="newRoom.name" type="text" class="form-control" placeholder="Room 105" />
+
+            <label class="form-label">
+              Room Name
+            </label>
+
+            <input
+              [(ngModel)]="newRoom.name"
+              type="text"
+              class="form-control"
+              placeholder="Room 105"
+            />
+
           </div>
+
+
           <div class="col-md-3">
-            <label class="form-label">Type</label>
-            <select [(ngModel)]="newRoom.type" class="form-select">
-              <option value="Guest Room">Guest Room</option>
-              <option value="Family Suite">Family Suite</option>
-              <option value="Deluxe Room">Deluxe Room</option>
-              <option value="Marriage Hall">Marriage Hall</option>
+
+            <label class="form-label">
+              Type
+            </label>
+
+            <select
+              [(ngModel)]="newRoom.type"
+              class="form-select"
+            >
+
+              <option value="Guest Room">
+                Guest Room
+              </option>
+
+              <option value="Family Suite">
+                Family Suite
+              </option>
+
+              <option value="Deluxe Room">
+                Deluxe Room
+              </option>
+
+              <option value="Marriage Hall">
+                Marriage Hall
+              </option>
+
             </select>
+
           </div>
+
+
           <div class="col-md-3">
-            <label class="form-label">Status</label>
-            <select [(ngModel)]="newRoom.status" class="form-select">
-              <option value="available">Available</option>
-              <option value="occupied">Occupied</option>
-              <option value="reserved">Reserved</option>
-              <option value="cleaning">Cleaning</option>
+
+            <label class="form-label">
+              Status
+            </label>
+
+            <select
+              [(ngModel)]="newRoom.status"
+              class="form-select"
+            >
+
+              <option value="available">
+                Available
+              </option>
+
+              <option value="occupied">
+                Occupied
+              </option>
+
+              <option value="reserved">
+                Reserved
+              </option>
+
+              <option value="cleaning">
+                Cleaning
+              </option>
+
             </select>
+
           </div>
+
+
           <div class="col-md-6">
-            <label class="form-label">Guest / Booking</label>
-            <input [(ngModel)]="newRoom.guestName" type="text" class="form-control" placeholder="No guest" />
+
+            <label class="form-label">
+              Guest / Booking
+            </label>
+
+            <input
+              [(ngModel)]="newRoom.guestName"
+              type="text"
+              class="form-control"
+              placeholder="No guest"
+            />
+
           </div>
+
+
           <div class="col-md-6 d-flex align-items-end">
-            <button class="btn btn-primary w-100" (click)="addRoom()">Add Room</button>
+
+            <button
+              class="btn btn-primary w-100"
+              (click)="addRoom()"
+            >
+
+              Add Room
+
+            </button>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
 
+
+    <!-- =========================================================
+         ROOM MANAGEMENT
+    ========================================================== -->
+
     <div class="table-responsive">
-      <table class="table table-bordered admin-table">
+
+      <table
+        class="table table-bordered admin-table"
+      >
+
         <thead>
+
           <tr>
-            <th>Room</th>
-            <th>Type</th>
-            <th>Current Status</th>
-            <th>Guest / Booking</th>
-            <th>Last Updated</th>
-            <th>Action</th>
+
+            <th>
+              Room
+            </th>
+
+            <th>
+              Type
+            </th>
+
+            <th>
+              Current Status
+            </th>
+
+            <th>
+              Guest / Booking
+            </th>
+
+            <th>
+              Last Updated
+            </th>
+
+            <th>
+              Action
+            </th>
+
           </tr>
+
         </thead>
+
+
         <tbody>
-          <tr *ngFor="let room of rooms">
-            <td>{{ room.name }}</td>
-            <td>{{ room.type }}</td>
+
+          <tr
+            *ngFor="let room of rooms"
+          >
+
             <td>
-              <span class="status-badge" [ngClass]="getStatusClass(room.status)">{{ getStatusLabel(room.status) }}</span>
+              {{ room.name }}
             </td>
-            <td>{{ room.guestName }}</td>
-            <td>{{ room.lastUpdated }}</td>
+
             <td>
-              <div class="d-flex flex-wrap gap-2">
-                <button class="btn btn-sm btn-outline-warning" (click)="markForCleaning(room.id)">Mark Cleaning</button>
-                <button class="btn btn-sm btn-outline-success" (click)="completeCleaning(room.id)">Cleaning Done</button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteRoom(room.id)">Delete</button>
-                <select class="form-select form-select-sm admin-status-select" [value]="room.status" (change)="setStatus(room.id, $any($event.target).value)">
-                  <option value="available">Available</option>
-                  <option value="occupied">Occupied</option>
-                  <option value="reserved">Reserved</option>
-                  <option value="cleaning">Cleaning</option>
+              {{ room.type }}
+            </td>
+
+            <td>
+
+              <span
+                class="status-badge"
+                [ngClass]="
+                  getStatusClass(
+                    room.status
+                  )
+                "
+              >
+
+                {{
+                  getStatusLabel(
+                    room.status
+                  )
+                }}
+
+              </span>
+
+            </td>
+
+            <td>
+              {{ room.guestName }}
+            </td>
+
+            <td>
+              {{ room.lastUpdated }}
+            </td>
+
+            <td>
+
+              <div
+                class="d-flex flex-wrap gap-2"
+              >
+
+                <button
+                  class="btn btn-sm btn-outline-warning"
+                  (click)="
+                    markForCleaning(
+                      room.id
+                    )
+                  "
+                >
+
+                  Mark Cleaning
+
+                </button>
+
+
+                <button
+                  class="btn btn-sm btn-outline-success"
+                  (click)="
+                    completeCleaning(
+                      room.id
+                    )
+                  "
+                >
+
+                  Cleaning Done
+
+                </button>
+
+
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="
+                    deleteRoom(
+                      room.id
+                    )
+                  "
+                >
+
+                  Delete
+
+                </button>
+
+
+                <select
+                  class="form-select form-select-sm admin-status-select"
+                  [value]="room.status"
+                  (change)="
+                    setStatus(
+                      room.id,
+                      $any($event.target).value
+                    )
+                  "
+                >
+
+                  <option value="available">
+                    Available
+                  </option>
+
+                  <option value="occupied">
+                    Occupied
+                  </option>
+
+                  <option value="reserved">
+                    Reserved
+                  </option>
+
+                  <option value="cleaning">
+                    Cleaning
+                  </option>
+
                 </select>
+
               </div>
+
             </td>
+
           </tr>
+
         </tbody>
+
       </table>
+
     </div>
+
   </div>
+
 </section>
+```

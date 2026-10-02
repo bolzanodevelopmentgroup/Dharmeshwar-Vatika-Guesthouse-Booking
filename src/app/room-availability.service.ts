@@ -73,6 +73,11 @@ export interface BookingResponse {
 
   message: string;
 
+  notifications?: {
+    email: 'sent' | 'failed' | 'not_configured';
+    whatsapp: 'sent' | 'failed' | 'not_configured';
+  };
+
   booking?: any;
 
   roomIds?: number[];
@@ -324,23 +329,24 @@ export class RoomAvailabilityService {
   |--------------------------------------------------------------------------
   */
 
-  addBooking(
-    roomType: string,
-    guestName: string,
-    checkIn: string,
-    checkOut: string,
-    roomsBooked: number
-  ): Observable<BookingResponse> {
+  addBooking(booking: {
+    roomType: string;
+    guestName: string;
+    customerName: string;
+    customerMobile: string;
+    customerEmail: string;
+    bookingDate: string;
+    eventType: string;
+    guestCount: string;
+    requirements: string;
+    checkIn: string;
+    checkOut: string;
+    roomsBooked: number;
+  }): Observable<BookingResponse> {
 
     return this.http.post<BookingResponse>(
       `${this.apiUrl}/bookings`,
-      {
-        roomType,
-        guestName,
-        checkIn,
-        checkOut,
-        roomsBooked
-      }
+      booking
     );
   }
 
@@ -404,6 +410,14 @@ export class RoomAvailabilityService {
       `${this.apiUrl}/rooms/${roomId}`
     );
   }
+
+deleteBooking(
+  bookingId: number
+) {
+  return this.http.delete(
+    `${this.apiUrl}/api/bookings/${bookingId}`
+  );
+}
 
   /*
   |--------------------------------------------------------------------------

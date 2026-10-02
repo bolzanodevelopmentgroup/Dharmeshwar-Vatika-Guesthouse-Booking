@@ -573,13 +573,23 @@ export class BookingPageComponent
 
     if (
       !this.booking.customerName.trim() ||
-      !this.booking.customerMobile.trim()
+      !this.booking.customerMobile.trim() ||
+      !this.booking.customerEmail.trim()
     ) {
 
       alert(
-        'Please enter Full Name and Mobile Number.'
+        'Please enter Full Name, Mobile Number, and Email Address.'
       );
 
+      return;
+    }
+
+    if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        this.booking.customerEmail.trim()
+      )
+    ) {
+      alert('Please enter a valid Email Address.');
       return;
     }
 
@@ -632,15 +642,20 @@ export class BookingPageComponent
            */
           this.roomAvailabilityService
             .addBooking(
-              this.booking.roomType,
-
-              this.booking.customerName.trim(),
-
-              this.booking.checkIn,
-
-              this.booking.checkOut,
-
-              requiredRooms
+              {
+                roomType: this.booking.roomType,
+                guestName: this.booking.customerName.trim(),
+                customerName: this.booking.customerName.trim(),
+                customerMobile: this.booking.customerMobile.trim(),
+                customerEmail: this.booking.customerEmail.trim(),
+                bookingDate: this.booking.bookingDate,
+                eventType: this.booking.eventType,
+                guestCount: this.booking.guestCount,
+                requirements: this.booking.requirements,
+                checkIn: this.booking.checkIn,
+                checkOut: this.booking.checkOut,
+                roomsBooked: requiredRooms
+              }
             )
             .subscribe({
 
@@ -662,62 +677,16 @@ export class BookingPageComponent
                 this.confirmationMessage =
                   `${reservation.message} Available rooms now: ${reservation.available}.`;
 
-                const message =
-                  `New Booking Request\n\n` +
-
-                  `Name: ${this.booking.customerName}\n` +
-
-                  `Mobile: ${this.booking.customerMobile}\n` +
-
-                  `Email: ${
-                    this.booking.customerEmail ||
-                    'Not provided'
-                  }\n` +
-
-                  `Check-in: ${
-                    this.booking.checkIn
-                  }\n` +
-
-                  `Check-out: ${
-                    this.booking.checkOut
-                  }\n` +
-
-                  `Event: ${
-                    this.booking.eventType
-                  }\n` +
-
-                  `Room Type: ${
-                    this.booking.roomType
-                      .replace(
-                        '-',
-                        ' '
-                      )
-                  }\n` +
-
-                  `Rooms: ${
-                    this.booking.roomCount
-                  }\n` +
-
-                  `Guests: ${
-                    this.booking.guestCount ||
-                    'Not mentioned'
-                  }\n` +
-
-                  `Requirements: ${
-                    this.booking.requirements ||
-                    'None'
-                  }\n` +
-
-                  `Status: ${
-                    reservation.message
-                  }`;
-
-                window.open(
-                  `https://wa.me/918208417376?text=${encodeURIComponent(
-                    message
-                  )}`,
-                  '_blank'
-                );
+                if (
+                  reservation.notifications &&
+                  (
+                    reservation.notifications.email !== 'sent' ||
+                    reservation.notifications.whatsapp !== 'sent'
+                  )
+                ) {
+                  this.confirmationMessage +=
+                    ' Admin notification delivery needs attention.';
+                }
 
                 alert(
                   this.confirmationMessage

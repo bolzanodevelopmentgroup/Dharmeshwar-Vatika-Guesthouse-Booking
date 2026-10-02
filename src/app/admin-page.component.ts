@@ -1,3 +1,4 @@
+
 import {
   Component,
   OnDestroy,
@@ -16,6 +17,29 @@ import {
   RoomStatus
 } from './room-availability.service';
 
+export interface CustomerBooking {
+  id: number;
+  roomType: string;
+
+  guestName: string;
+  customerName: string;
+  customerMobile: string;
+  customerEmail: string;
+
+  bookingDate: string;
+  eventType: string;
+  guestCount: string | number;
+  requirements: string;
+
+  checkIn: string;
+  checkOut: string;
+
+  roomsBooked: number;
+
+  roomId?: number | null;
+  roomIds?: number[];
+}
+
 @Component({
   selector: 'app-admin-page',
   templateUrl: './admin-page.component.html',
@@ -30,6 +54,8 @@ export class AdminPageComponent
     new Subject<void>();
 
   rooms: RoomRecord[] = [];
+
+  bookings: CustomerBooking[] = [];
 
   summary: DashboardSummary = {
     total: 0,
@@ -65,20 +91,12 @@ export class AdminPageComponent
   ngOnInit(): void {
 
     /*
-     * Initial data.
+     * Initial dashboard load.
      */
     this.refreshView();
 
     /*
-     * REAL-TIME ROOM UPDATE.
-     *
-     * This fires when:
-     *
-     * Admin A changes room status
-     * OR
-     * MongoDB Compass changes room status
-     * OR
-     * another browser changes room status
+     * REAL-TIME ROOM UPDATE
      */
     this.roomAvailabilityService.roomsChanged$
       .pipe(
@@ -94,13 +112,12 @@ export class AdminPageComponent
             event
           );
 
-          this.refreshView();
+          this.refreshRooms();
         }
       );
 
     /*
-     * Booking changes can also affect
-     * reserved room counts.
+     * REAL-TIME BOOKING UPDATE
      */
     this.roomAvailabilityService.bookingsChanged$
       .pipe(
@@ -116,12 +133,16 @@ export class AdminPageComponent
             event
           );
 
-          this.refreshView();
+          this.refreshBookings();
+
+          this.refreshRooms();
+
+          this.refreshSummary();
         }
       );
 
     /*
-     * Socket connection.
+     * Socket.IO CONNECTION
      */
     this.roomAvailabilityService.connection$
       .pipe(
@@ -136,6 +157,7 @@ export class AdminPageComponent
             connected;
 
           if (connected) {
+
             this.refreshView();
           }
         }
@@ -151,11 +173,26 @@ export class AdminPageComponent
 
   /*
   |--------------------------------------------------------------------------
-  | REFRESH
+  | REFRESH EVERYTHING
   |--------------------------------------------------------------------------
   */
 
   refreshView(): void {
+
+    this.refreshRooms();
+
+    this.refreshSummary();
+
+    this.refreshBookings();
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | ROOMS
+  |--------------------------------------------------------------------------
+  */
+
+  refreshRooms(): void {
 
     this.roomAvailabilityService
       .getRooms()
@@ -174,6 +211,15 @@ export class AdminPageComponent
           );
         }
       });
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | SUMMARY
+  |--------------------------------------------------------------------------
+  */
+
+  refreshSummary(): void {
 
     this.roomAvailabilityService
       .getDashboardSummary()
@@ -190,6 +236,130 @@ export class AdminPageComponent
           console.error(
             'Unable to load summary:',
             error
+          );
+        }
+      });
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | CUSTOMER BOOKINGS
+  |--------------------------------------------------------------------------
+  */
+
+  refreshBookings(): void {
+
+    this.roomAvailabilityService
+      .getBookings()
+      .subscribe({
+
+        next: (bookings) => {
+
+          this.bookings =
+            [...bookings].sort(
+              (a: CustomerBooking, b: CustomerBooking) =>
+                Number(b.id) -
+                Number(a.id)
+            );
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Unable to load customer bookings:',
+            error
+          );
+        }
+      });
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | CONTACT CUSTOMER
+  |--------------------------------------------------------------------------
+  */
+
+  callCustomer(
+    mobile: string
+  ): void {
+
+    if (!mobile) {
+      return;
+    }
+
+    window.location.href =
+      `tel:${mobile}`;
+  }
+
+  emailCustomer(
+    email: string
+  ): void {
+
+    if (!email) {
+      return;
+    }
+
+    window.location.href =
+      `mailto:${email}`;
+  }
+
+  whatsappCustomer(
+    mobile: string
+  ): void {
+
+    if (!mobile) {
+      return;
+    }
+
+    const cleanNumber =
+      mobile.replace(
+        /[^0-9]/g,
+        ''
+      );
+
+    window.open(
+      `https://wa.me/${cleanNumber}`,
+      '_blank'
+    );
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | DELETE BOOKING
+  |--------------------------------------------------------------------------
+  */
+
+  deleteBooking(
+    bookingId: number
+  ): void {
+
+    if (
+      !confirm(
+        'Delete this customer booking?'
+      )
+    ) {
+      return;
+    }
+
+    this.roomAvailabilityService
+      .deleteBooking(bookingId)
+      .subscribe({
+
+        next: () => {
+
+          this.refreshView();
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Unable to delete booking:',
+            error
+          );
+
+          alert(
+            error?.error?.message ||
+            'Unable to delete booking.'
           );
         }
       });
@@ -262,10 +432,6 @@ export class AdminPageComponent
             lastUpdated: 'Today'
           };
 
-          /*
-           * Socket.IO will also update
-           * all connected clients.
-           */
           this.refreshView();
         },
 
@@ -335,9 +501,6 @@ export class AdminPageComponent
 
         next: () => {
 
-          /*
-           * The server emits realtime event.
-           */
           this.refreshView();
         },
 
@@ -475,4 +638,34 @@ export class AdminPageComponent
         return 'Cleaning';
     }
   }
+
+  /*
+  |--------------------------------------------------------------------------
+  | BOOKING ROOM TYPE LABEL
+  |--------------------------------------------------------------------------
+  */
+
+  getBookingRoomType(
+    roomType: string
+  ): string {
+
+    switch (roomType) {
+
+      case 'guest-room':
+        return 'Guest Room';
+
+      case 'family-suite':
+        return 'Family Suite';
+
+      case 'deluxe-room':
+        return 'Deluxe Room';
+
+      case 'marriage-hall':
+        return 'Marriage Hall';
+
+      default:
+        return roomType || '-';
+    }
+  }
 }
+
