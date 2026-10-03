@@ -12,14 +12,26 @@ const httpServer = http.createServer(app);
 
 const PORT = Number(process.env.PORT || 3000);
 
+const REQUIRE_MONGODB =
+  process.env.NODE_ENV === 'production' ||
+  process.env.REQUIRE_MONGODB === 'true';
+
+const MONGODB_DATABASE =
+  process.env.MONGODB_DATABASE ||
+  'dharmeshwar_guesthouse';
+
 const MONGODB_URI =
   process.env.MONGODB_URI ||
-  'mongodb://127.0.0.1:27017/dharmeshwar_guesthouse';
+  (REQUIRE_MONGODB
+    ? ''
+    : 'mongodb://127.0.0.1:27017/dharmeshwar_guesthouse');
 
 const FRONTEND_ORIGIN =
   process.env.FRONTEND_ORIGIN || 'http://localhost:4200';
 
-const ADMIN_EMAIL = 'bolzanodevelopmentgroup@gmail.com';
+const ADMIN_EMAIL =
+  process.env.BOOKING_ADMIN_EMAIL ||
+  'testuserdec292000@gmail.com';
 const ADMIN_WHATSAPP =
   process.env.BOOKING_WHATSAPP_TO || '917044099619';
 
@@ -742,9 +754,16 @@ function reserveRoomAllocationsForBooking(
 
 async function connectToMongo() {
   try {
+    if (!MONGODB_URI) {
+      throw new Error(
+        'MONGODB_URI must be configured when MongoDB is required.'
+      );
+    }
+
     await mongoose.connect(
       MONGODB_URI,
       {
+        dbName: MONGODB_DATABASE,
         serverSelectionTimeoutMS: 5000,
         retryWrites: true,
         w: 'majority'
@@ -777,6 +796,12 @@ async function connectToMongo() {
       'MongoDB connection failed:',
       error.message
     );
+
+    if (REQUIRE_MONGODB) {
+      throw new Error(
+        `Server startup stopped because required MongoDB is unavailable: ${error.message}`
+      );
+    }
 
     /*
      * Use fallback memory data.

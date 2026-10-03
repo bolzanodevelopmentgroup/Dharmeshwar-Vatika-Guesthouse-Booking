@@ -1910,11 +1910,6 @@ RESPONSIVE
 }
 
 @media (max-width: 991px) {
-  .navbar-collapse {
-    display: flex !important;
-    justify-content: flex-end;
-  }
-
   .hero {
     height: auto;
 
@@ -2693,5 +2688,112 @@ HERO
 
   .floating-btn span {
     display: none;
+  }
+}
+
+@media (max-width: 991px) {
+  .navbar-collapse:not(.show) {
+    display: none !important;
+  }
+
+  .navbar-collapse.show {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding-top: 12px;
+  }
+
+  .navbar-collapse.collapsing {
+    display: block !important;
+  }
+
+  .navbar-nav {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 10px 12px;
+  }
+
+  .navbar-collapse .book-btn {
+    align-self: flex-start;
+    margin: 10px 12px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-header-content {
+    justify-content: center;
+    gap: 8px 16px;
+  }
+
+  .center-info {
+    flex-basis: 100%;
+    justify-content: center;
+    order: -1;
+    font-size: 17px;
+    text-align: center;
+  }
+
+  .right-info {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .custom-navbar {
+    padding: 8px 0;
+  }
+
+  .navbar-brand {
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .navbar-brand img {
+    width: 56px;
+    height: 56px;
+    border-width: 3px;
+  }
+
+  .brand-text h2 {
+    font-size: 1.35rem;
+  }
+
+  .brand-text p {
+    font-size: 0.68rem;
+    letter-spacing: 0.4px;
+  }
+}
+
+@media (max-width: 576px) {
+  .left-info,
+  .right-info a {
+    font-size: 13px;
+  }
+
+  .right-info i {
+    font-size: 16px;
+  }
+
+  .brand-text h2 {
+    font-size: 1.05rem;
+  }
+
+  .brand-text p {
+    font-size: 0.58rem;
+  }
+
+  .navbar-brand img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .navbar-toggler {
+    padding: 5px 8px;
   }
 }
