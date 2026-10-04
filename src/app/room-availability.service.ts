@@ -415,7 +415,7 @@ deleteBooking(
   bookingId: number
 ) {
   return this.http.delete(
-    `${this.apiUrl}/api/bookings/${bookingId}`
+    `${this.apiUrl}/bookings/${bookingId}`
   );
 }
 

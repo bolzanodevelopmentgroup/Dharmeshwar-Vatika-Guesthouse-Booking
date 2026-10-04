@@ -31,7 +31,7 @@ const FRONTEND_ORIGIN =
 
 const ADMIN_EMAIL =
   process.env.BOOKING_ADMIN_EMAIL ||
-  'testuserdec292000@gmail.com';
+  'testuser2.022016@gmail.com';
 const ADMIN_WHATSAPP =
   process.env.BOOKING_WHATSAPP_TO || '917044099619';
 
